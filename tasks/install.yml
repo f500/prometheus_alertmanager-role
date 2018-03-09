@@ -41,21 +41,31 @@
 - name: ALERTMANAGER | Check alertmanager version
   command: alertmanager {{ option_bullet }}version
   register: alertmanager_check
-  changed_when: false
-  ignore_errors: true
+  changed_when: no
+  ignore_errors: yes
+
+- name: ALERTMANAGER | Check if installation is needed
+  set_fact:
+    alertmanager_install: >-
+      {{
+      alertmanager_check|failed or (
+      'alertmanager, version ' + alertmanager_version not in alertmanager_check.stdout and
+      'alertmanager, version ' + alertmanager_version not in alertmanager_check.stderr
+      )
+      }}
 
 - name: ALERTMANAGER | Download package
   get_url:
     url: "{{ alertmanager_url }}"
     dest: /tmp
-  when: 'alertmanager_force_reinstall or alertmanager_check|failed or "alertmanager, version {{ alertmanager_version }}" not in alertmanager_check.stderr'
+  when: alertmanager_install or alertmanager_force_reinstall
 
 - name: ALERTMANAGER | Extract package
   unarchive:
     copy: no
     src: "/tmp/{{ alertmanager_package }}"
     dest: /tmp
-  when: 'alertmanager_force_reinstall or alertmanager_check|failed or "alertmanager, version {{ alertmanager_version }}" not in alertmanager_check.stderr'
+  when: alertmanager_install or alertmanager_force_reinstall
 
 - name: ALERTMANAGER | Copy binary
   copy:
@@ -65,7 +75,7 @@
     group: "{{ alertmanager_group }}"
     remote_src: True
     mode: 0755
-  when: 'alertmanager_force_reinstall or alertmanager_check|failed or "alertmanager, version {{ alertmanager_version }}" not in alertmanager_check.stderr'
+  when: alertmanager_install or alertmanager_force_reinstall
   notify: restart alertmanager
 
 - name: ALERTMANAGER | Link binary
