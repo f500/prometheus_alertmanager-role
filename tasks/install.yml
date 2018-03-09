@@ -28,8 +28,18 @@
     - "{{ alertmanager_bin_path }}"
     - "{{ alertmanager_log_path }}"
 
+- name: ALERTMANAGER | Use -- as option-bullet
+  set_fact:
+    option_bullet: "--"
+  when: alertmanager_version|version_compare('0.12', '>=')
+
+- name: ALERTMANAGER | Use - as option-bullet
+  set_fact:
+    option_bullet: "-"
+  when: alertmanager_version|version_compare('0.12', '<')
+
 - name: ALERTMANAGER | Check alertmanager version
-  command: alertmanager -version
+  command: alertmanager {{ option_bullet }}version
   register: alertmanager_check
   changed_when: false
   ignore_errors: true
