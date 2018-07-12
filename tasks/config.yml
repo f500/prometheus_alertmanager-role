@@ -11,7 +11,7 @@
     - "1_global_alertmanager"
 
 - name: ALERTMANAGER | Copy server config (other parts)
-  copy:
+  template:
     src: "{{ item }}"
     dest: "{{alertmanager_conf_path}}/parts/{{ item | basename }}"
     owner: "{{ alertmanager_user }}"
@@ -26,7 +26,7 @@
   register: check_parts
 
 - name: ALERTMANAGER | Copy default parts
-  copy:
+  template:
     src: "{{ item }}"
     dest: "{{alertmanager_conf_path}}/parts/{{ item }}"
     owner: "{{ alertmanager_user }}"
