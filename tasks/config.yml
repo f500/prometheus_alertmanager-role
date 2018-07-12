@@ -37,6 +37,8 @@
     - 3_inhibit_rules_alertmanager
     - 4_receivers_alertmanager
   when: check_parts.files|length < 2
+  notify:
+    - reload alertmanager
 
 - name: ALERTMANAGER | Join config parts
   assemble:
