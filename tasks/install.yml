@@ -31,12 +31,12 @@
 - name: ALERTMANAGER | Use -- as option-bullet
   set_fact:
     option_bullet: "--"
-  when: alertmanager_version|version_compare('0.12', '>=')
+  when: alertmanager_version is version('0.12', '>=')
 
 - name: ALERTMANAGER | Use - as option-bullet
   set_fact:
     option_bullet: "-"
-  when: alertmanager_version|version_compare('0.12', '<')
+  when: alertmanager_version is version('0.12', '<')
 
 - name: ALERTMANAGER | Check alertmanager version
   command: alertmanager {{ option_bullet }}version
@@ -48,7 +48,7 @@
   set_fact:
     alertmanager_install: >-
       {{
-      alertmanager_check|failed or (
+      alertmanager_check is failed or (
       'alertmanager, version ' + alertmanager_version not in alertmanager_check.stdout and
       'alertmanager, version ' + alertmanager_version not in alertmanager_check.stderr
       )
